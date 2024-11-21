@@ -16,7 +16,7 @@ base_size = width/10 # will later be used for scaleability of the window
 types_of_units = 4
 x_offset = 0
 money = None
-enemy_money = 200 # we will see if I manage to make good enough opponents to keep this balanced
+enemy_money = None
 show_main_menu = True
 shift = False
 right_click_menu = False
@@ -25,12 +25,13 @@ selected_units = []
 
 # loading the data from the json file
 def load_data_json(type):
-    global money, level_width, positions_of_trenches, alied, enemy
+    global money, level_width, positions_of_trenches, alied, enemy, enemy_money
     #print(type)
     if type == "endless":
         with open("levels/endless.json", "r") as file:
             data = json.load(file)
             money = data["money"]
+            enemy_money = data["enemy_money"]
             level_width = data["level_width"]
             positions_of_trenches = data["positions_of_trenches"] # later I will try to create a build menu for the game, for now this is enough though
             alied = data["allied"]
@@ -49,15 +50,66 @@ def load_data_json(type):
 
 # function that loads the selected images and sets up the level, for now only flags
 def setup_level():
-    global alied_flag, enemy_flag, object_group, flags, positions_of_trenches, number_of_trenches, level_width, unit_images_running, unit_images_firing, tank_images
+    global alied_flag, enemy_flag, object_group, flags, positions_of_trenches, number_of_trenches, level_width, unit_images_running_allies, unit_images_firing_allies, tank_images_allies, unit_images_running_enemies, unit_images_firing_enemies, tank_images_enemies
     # loading the images, this will later be done based on who is fighting who, you can see this in the json file
-    alied_flag = Flag("alied", pygame.transform.flip(pygame.transform.scale(pygame.image.load("assets/default_flag1.png"), (100, 100)), True, False), level_width, height)
-    enemy_flag = Flag("enemy", pygame.transform.scale(pygame.image.load("assets/default_flag2.png"), (100, 100)), level_width, height)
-    flags.add(alied_flag)
-    flags.add(enemy_flag)
-    unit_images_running = [pygame.transform.scale(pygame.image.load("assets/soldier.png"), (50, 50))]
-    unit_images_firing = [pygame.transform.scale(pygame.image.load("assets/unit.png"), (50, 50))] # the firing image is the one used in the trenches, maybe this will change later
-    tank_images = [pygame.transform.scale(pygame.image.load("assets/tank.png"), (100, 100))]
+    if alied == "default":
+        alied_flag = Flag("alied", pygame.transform.flip(pygame.transform.scale(pygame.image.load("assets/default_flag1.png"), (100, 100)), True, False), level_width, height)
+        flags.add(alied_flag)
+        unit_images_running_allies = [pygame.transform.scale(pygame.image.load("assets/soldier.png"), (50, 50))]
+        unit_images_firing_allies = [pygame.transform.scale(pygame.image.load("assets/unit.png"), (50, 50))] # the firing image is the one used in the trenches, maybe this will change later
+        tank_images_allies = [pygame.transform.scale(pygame.image.load("assets/tank.png"), (100, 100))]
+    elif alied == "british":
+        pass
+    elif alied == "germans":
+        pass
+    elif alied == "french":
+        pass
+    elif alied == "russians":
+        pass
+    elif alied == "austro-hungarians":
+        pass
+    elif alied == "ottomans":
+        pass
+    elif alied == "bulgarians":
+        pass
+    elif alied == "serbians":
+        pass
+    elif alied == "greeks":
+        pass
+    elif alied == "italians":
+        pass
+    elif alied == "americans":
+        pass
+
+    if enemy == "default":
+        enemy_flag = Flag("enemy", pygame.transform.scale(pygame.image.load("assets/default_flag2.png"), (100, 100)), level_width, height)
+        flags.add(enemy_flag)
+        unit_images_running_enemies = [pygame.transform.scale(pygame.image.load("assets/soldier.png"), (50, 50))]
+        unit_images_firing_enemies = [pygame.transform.scale(pygame.image.load("assets/unit.png"), (50, 50))] # the firing image is the one used in the trenches, maybe this will change later
+        tank_images_enemies = [pygame.transform.scale(pygame.image.load("assets/tank.png"), (100, 100))]
+    elif enemy == "british":
+        pass
+    elif enemy == "germans":
+        pass
+    elif enemy == "french":
+        pass
+    elif enemy == "russians":
+        pass
+    elif enemy == "austro-hungarians":
+        pass
+    elif enemy == "ottomans":
+        pass
+    elif enemy == "bulgarians":
+        pass
+    elif enemy == "serbians":
+        pass
+    elif enemy == "greeks":
+        pass
+    elif enemy == "italians":
+        pass
+    elif enemy == "americans":
+        pass
+    
     for i in range(len(positions_of_trenches)):
         trench = Trench(positions_of_trenches[i], number_of_trenches)
         object_group.add(trench)
@@ -74,11 +126,11 @@ def main_menu_loop():
         pygame.draw.rect(screen, (50, 50, 50), (width/2 - 250, height/2 + 250, 500, 100))
         # drawing the text on the buttons
         text = font.render("Endless", True, (0, 0, 0))
-        screen.blit(text, (width/2 - text.get_width()/2, height/2 - 50 + text.get_height()/2))
+        screen.blit(text, (width/2 - text.get_width()/2, height/2 - 25  + text.get_height()/2))
         text = font.render("Levels", True, (0, 0, 0))
-        screen.blit(text, (width/2 - text.get_width()/2, height/2 + 100 + text.get_height()/2))
+        screen.blit(text, (width/2 - text.get_width()/2, height/2 + 125 + text.get_height()/2))
         text = font.render("Exit", True, (0, 0, 0))
-        screen.blit(text, (width/2 - text.get_width()/2, height/2 + 250 + text.get_height()/2))
+        screen.blit(text, (width/2 - text.get_width()/2, height/2 + 275 + text.get_height()/2))
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -98,14 +150,15 @@ def main_menu_loop():
                         running = False
                         show_main_menu = False
         pygame.display.update()
-# function for drawing the levels choices
+
+# function for drawing the levels choices, later they will be organized in a better way, this is just for testing
 def levels_choice_menu():
     # getting the number of levels
     with open("levels/Info.json", "r") as file:
         data = json.load(file)
         number_of_levels = data["number_of_levels"]
     file.close()
-    global font
+    global font, running
     choice_menu = True
     while choice_menu:
         screen.fill((255, 255, 255))
@@ -128,10 +181,22 @@ def levels_choice_menu():
 
         pygame.display.update()
 
+# function that resets the game
+def reset_game():
+    global allied_unit_group, enemy_unit_group, object_group, money, enemy_money, show_game_menu, show_main_menu, selected_units, right_click_menu
+    allied_unit_group.empty()
+    enemy_unit_group.empty()
+    object_group.empty()
+    money = None
+    enemy_money = None
+    show_game_menu = False
+    selected_units.clear()
+    right_click_menu = False
+
 # enemy control function this is a basic version of the enemy control, will be enhanced later, for now it works as intended
 # is currently capable of winning the game
 def enemy_con():
-    global running, object_group, allied_unit_group, enemy_unit_group
+    global running, object_group, allied_unit_group, enemy_unit_group, show_game_menu, show_main_menu
     can_buy = True
     # creating a 2d array that resembles the trench positions and who owns them
     trench_positions = []
@@ -140,51 +205,53 @@ def enemy_con():
     # sorting the trench positions based on the id from the biggest to the smallest
     trench_positions = sorted(trench_positions, key=lambda x: x[2], reverse=True)
     while running:
-        # checking if the enemy can still buy units, this is done by checking if no allied units are near the enemy flag(this is done, because the battle would not end otherwise)
-        #for unit in allied_unit_group:
-        #    if unit.rect.x > enemy_flag.rect.x - 200:
-        #        can_buy = False
-        #        break                              # I think this is causing some problems to the units movement, but I will have to test it more to be sure
-        #    else:
-        #        can_buy = True
-        # updating the trench positions
-        for trench in object_group:
-            for pos in trench_positions:
-                if pos[2] == trench.id:
-                    pos[1] = trench.current_owner
-                    pos[3] = trench.units_in_trench
-                    pos[4] = trench.current_owner
-                    break
-        # sorting the trench positions based on the id from the biggest to the smallest
-        trench_positions = sorted(trench_positions, key=lambda x: x[2], reverse=True)
-            # main logic here
-        # buying units
-        if can_buy:
-            buy(random.randint(0,3), "enemy")
-        # sending out orders, for now only basic ones
-        for trench in trench_positions:
-            # getting the next trench in line using the trench_positions array and the current trench id
-            for pos in trench_positions:
-                if pos[2] == trench[2] - 1:
-                    next_trench = pos
-                    break
-            # checking if the next trench in line is owned by no one, using the trench_positions array, if so then sending the units from the closest enemy owned trench
-            if next_trench[1] == "none" and trench[1] == "enemy":
-                #print("sending units from trench " + str(trench[2]) + " to trench " + str(next_trench[2])+" because its empty")
-                send_units_forward(trench[2], "enemy", None)
-                        
-            
-            # checking if there is at least ten units in the enemy owned trenches, if not then sending all the units from the closest enemy owned trench
-            if next_trench[1] == "enemy" and trench[1] == "enemy" and next_trench[3] < 10:
-                #print("sending units from trench " + str(trench[2]) + " to trench " + str(next_trench[2])+" because there are only " + str(next_trench[3]) + " units in the trench")
-                send_units_forward(trench[2], "enemy", None)
-            
-            # checking if the enemy has a number advantage compared to the alied trench, if so then sending all units to atack
-            if next_trench[1] == "alied" and trench[1] == "enemy" and next_trench[3] < trench[3]:
-                #print("sending units from trench " + str(trench[2]) + " to trench " + str(next_trench[2])+" because the enemy has a number advantage")
-                send_units_forward(trench[2], "enemy", None)
+        if show_game_menu == False and show_main_menu == False:
+            # checking if the enemy can still buy units, this is done by checking if no allied units are near the enemy flag(this is done, because the battle would not end otherwise)
+            #for unit in allied_unit_group:
+            #    if unit.rect.x > enemy_flag.rect.x - 200:
+            #        can_buy = False
+            #        break                              # I think this is causing some problems to the units movement, but I will have to test it more to be sure
+            #    else:
+            #        can_buy = True
+            # updating the trench positions
+            for trench in object_group:
+                for pos in trench_positions:
+                    if pos[2] == trench.id:
+                        pos[1] = trench.current_owner
+                        pos[3] = trench.units_in_trench
+                        pos[4] = trench.current_owner
+                        break
+            # sorting the trench positions based on the id from the biggest to the smallest
+            trench_positions = sorted(trench_positions, key=lambda x: x[2], reverse=True)
+                # main logic here
+            # buying units
+            if can_buy:
+                buy(random.randint(0,3), "enemy")
+            # sending out orders, for now only basic ones
+            for trench in trench_positions:
+                # getting the next trench in line using the trench_positions array and the current trench id
+                for pos in trench_positions:
+                    if pos[2] == trench[2] - 1:
+                        next_trench = pos
+                        break
+                # checking if the next trench in line is owned by no one, using the trench_positions array, if so then sending the units from the closest enemy owned trench
+                if next_trench[1] == "none" and trench[1] == "enemy":
+                    #print("sending units from trench " + str(trench[2]) + " to trench " + str(next_trench[2])+" because its empty")
+                    send_units_forward(trench[2], "enemy", None)
+                            
+                
+                # checking if there is at least ten units in the enemy owned trenches, if not then sending all the units from the closest enemy owned trench
+                if next_trench[1] == "enemy" and trench[1] == "enemy" and next_trench[3] < 10:
+                    #print("sending units from trench " + str(trench[2]) + " to trench " + str(next_trench[2])+" because there are only " + str(next_trench[3]) + " units in the trench")
+                    send_units_forward(trench[2], "enemy", None)
+                
+                # checking if the enemy has a number advantage compared to the alied trench, if so then sending all units to atack
+                if next_trench[1] == "alied" and trench[1] == "enemy" and next_trench[3] < trench[3]:
+                    #print("sending units from trench " + str(trench[2]) + " to trench " + str(next_trench[2])+" because the enemy has a number advantage")
+                    send_units_forward(trench[2], "enemy", None)
 
-        #print(trench_positions)
+            #print(trench_positions)
+            clock.tick(1)
         clock.tick(1)
 
 # function that updates the offset of the camera
@@ -239,40 +306,40 @@ def progress_bar():
 
 # buy function
 def buy(unit_type, owner):
-    global money, allied_unit_group, enemy_money, enemy_unit_group, tank_images, enemy_flag, alied_flag, number_of_units
+    global money, allied_unit_group, enemy_money, enemy_unit_group, tank_images_allies, enemy_flag, alied_flag, number_of_units, unit_images_running_allies, unit_images_firing_allies, unit_images_running_enemies, unit_images_firing_enemies, tank_images_enemies
     number_of_units += 1
     if owner == "alied" and money >= 5:
         if unit_type == 0:
-            unit = Unit(0, "alied", unit_images_running, unit_images_firing, enemy_flag, alied_flag, number_of_units)
+            unit = Unit(0, "alied", unit_images_running_allies, unit_images_firing_allies, enemy_flag, alied_flag, number_of_units)
             allied_unit_group.add(unit)
             money -= 5
         if unit_type == 1 and money >= 10:
-            unit = Unit(1, "alied", unit_images_running, unit_images_firing, enemy_flag, alied_flag, number_of_units)
+            unit = Unit(1, "alied", unit_images_running_allies, unit_images_firing_allies, enemy_flag, alied_flag, number_of_units)
             allied_unit_group.add(unit)
             money -= 10
         if unit_type == 2 and money >= 20:
-            unit = Unit(2, "alied", unit_images_running, unit_images_firing, enemy_flag, alied_flag, number_of_units)
+            unit = Unit(2, "alied", unit_images_running_allies, unit_images_firing_allies, enemy_flag, alied_flag, number_of_units)
             allied_unit_group.add(unit)
             money -= 20
         if unit_type == 3 and money >= 50:
-            unit = tank("alied", 3, tank_images, enemy_flag, alied_flag, number_of_units)
+            unit = tank("alied", 3, tank_images_allies, enemy_flag, alied_flag, number_of_units)
             allied_unit_group.add(unit)
             money -= 50
     elif owner == "enemy":
         if unit_type == 0 and enemy_money >= 5:
-            unit = Unit(0, "enemy", unit_images_running, unit_images_firing, enemy_flag, alied_flag, number_of_units)
+            unit = Unit(0, "enemy", unit_images_running_enemies, unit_images_firing_enemies, enemy_flag, alied_flag, number_of_units)
             enemy_unit_group.add(unit)
             enemy_money -= 5
         if unit_type == 1 and enemy_money >= 10:
-            unit = Unit(1, "enemy", unit_images_running, unit_images_firing, enemy_flag, alied_flag, number_of_units)
+            unit = Unit(1, "enemy", unit_images_running_enemies, unit_images_firing_enemies, enemy_flag, alied_flag, number_of_units)
             enemy_unit_group.add(unit)
             enemy_money -= 10
         if unit_type == 2 and enemy_money >= 20:
-            unit = Unit(2, "enemy", unit_images_running, unit_images_firing, enemy_flag, alied_flag, number_of_units)
+            unit = Unit(2, "enemy", unit_images_running_enemies, unit_images_firing_enemies, enemy_flag, alied_flag, number_of_units)
             enemy_unit_group.add(unit)
             enemy_money -= 20
         if unit_type == 3 and enemy_money >= 50:
-            unit = tank("enemy", 3, tank_images, enemy_flag, alied_flag, number_of_units)
+            unit = tank("enemy", 3, tank_images_enemies, enemy_flag, alied_flag, number_of_units)
             enemy_unit_group.add(unit)
             enemy_money -= 50
 
@@ -395,62 +462,66 @@ def show_trench_menu(trench_id, x, types):
 
 # function to show trench commands(originaly this was in the class it self, but I had to redo it here because the drawing cant be done from another file)
 def show_trench_commands(trench):
-        # if there is at least one unit in the trench, control buttons will appear above the trench
-        if trench.units_in_trench > 0 and trench.current_owner == "alied":
-            pygame.draw.rect(screen, (50, 50, 50), (trench.rect.x, 50, 50, 50))
-            # if the button is clicked, the units will leave the trench
-            if pygame.mouse.get_pressed()[0]:
-                pos = pygame.mouse.get_pos()
-                if pos[0] > trench.rect.x and pos[0] < trench.rect.x + 50 and pos[1] > 50 and pos[1] < 100:
-                    send_units_forward(trench.id, trench.current_owner, None)
-            # creating a button, that will send the units back
-            pygame.draw.rect(screen, (50, 50, 50), (trench.rect.x, 0, 50, 50))
-            if pygame.mouse.get_pressed()[0]:
-                pos = pygame.mouse.get_pos()
-                if pos[0] > trench.rect.x and pos[0] < trench.rect.x + 50 and pos[1] > 0 and pos[1] < 50:
-                    send_units_back(trench.id, trench.current_owner)
-            # creating a drop down menu button, that will show all the unit types in the trench
-            pygame.draw.rect(screen, (50, 50, 50), (trench.rect.x, 50, 100, 50))
-            if pygame.mouse.get_pressed()[0]:
-                pos = pygame.mouse.get_pos()
-                if pos[0] > trench.rect.x and pos[0] < trench.rect.x + 100 and pos[1] > 50 and pos[1] < 100:
-                    trench.show_menu = True
-            if trench.show_menu:
-                show_trench_menu(trench.id, trench.rect.x, trench.types_in_trench)
+    global show_game_menu
+    # if there is at least one unit in the trench, control buttons will appear above the trench
+    if trench.units_in_trench > 0 and trench.current_owner == "alied":
+        pygame.draw.rect(screen, (50, 50, 50), (trench.rect.x, 50, 50, 50))
+        # if the button is clicked, the units will leave the trench
+        if pygame.mouse.get_pressed()[0] and show_game_menu == False:
+            pos = pygame.mouse.get_pos()
+            if pos[0] > trench.rect.x and pos[0] < trench.rect.x + 50 and pos[1] > 50 and pos[1] < 100:
+                send_units_forward(trench.id, trench.current_owner, None)
+        # creating a button, that will send the units back
+        pygame.draw.rect(screen, (50, 50, 50), (trench.rect.x, 0, 50, 50))
+        if pygame.mouse.get_pressed()[0] and show_game_menu == False:
+            pos = pygame.mouse.get_pos()
+            if pos[0] > trench.rect.x and pos[0] < trench.rect.x + 50 and pos[1] > 0 and pos[1] < 50:
+                send_units_back(trench.id, trench.current_owner)
+        # creating a drop down menu button, that will show all the unit types in the trench
+        pygame.draw.rect(screen, (50, 50, 50), (trench.rect.x, 50, 100, 50))
+        if pygame.mouse.get_pressed()[0] and show_game_menu == False:
+            pos = pygame.mouse.get_pos()
+            if pos[0] > trench.rect.x and pos[0] < trench.rect.x + 100 and pos[1] > 50 and pos[1] < 100:
+                trench.show_menu = True
+        if trench.show_menu:
+            show_trench_menu(trench.id, trench.rect.x, trench.types_in_trench)
 
-        # creating a button, that will auto send all units coming through
-        # this has to be outside of the main button loop, because it has to be shown at all times
-        if trench.current_owner == "alied":
-            # drawing the buttons
-            #if autosend is false than lowering the visibility of the button
-            if trench.auto_send:
-                pygame.draw.rect(screen, (0, 255, 0), (trench.rect.x -50, 50, 50, 50), 100)
-            else:
-                pygame.draw.rect(screen, (0, 150, 0), (trench.rect.x-50, 50, 50, 50), 100)
-            # checking if the button is clicked
-            if pygame.mouse.get_pressed()[0]:
-                pos = pygame.mouse.get_pos()
-                if pos[0] > trench.rect.x - 50 and pos[0] < trench.rect.x and pos[1] > 50 and pos[1] < 100:
-                    trench.auto_send = True
-            #drawing the stop button
-            #if autosend is true than lowering the visibility of the button
-            if trench.auto_send:
-                pygame.draw.rect(screen, (150, 0, 0), (trench.rect.x-100, 50, 50, 50), 100)
-            else:
-                pygame.draw.rect(screen, (255, 0, 0), (trench.rect.x-100, 50, 50, 50))
-            if pygame.mouse.get_pressed()[0]:
-                pos = pygame.mouse.get_pos()
-                if pos[0] > trench.rect.x - 100 and pos[0] < trench.rect.x - 50 and pos[1] > 50 and pos[1] < 100:
-                    trench.auto_send = False
+    # creating a button, that will auto send all units coming through
+    # this has to be outside of the main button loop, because it has to be shown at all times
+    if trench.current_owner == "alied":
+        # drawing the buttons
+        #if autosend is false than lowering the visibility of the button
+        if trench.auto_send:
+            pygame.draw.rect(screen, (0, 255, 0), (trench.rect.x -50, 50, 50, 50), 100)
+        else:
+            pygame.draw.rect(screen, (0, 150, 0), (trench.rect.x-50, 50, 50, 50), 100)
+        # checking if the button is clicked
+        if pygame.mouse.get_pressed()[0] and show_game_menu == False:
+            pos = pygame.mouse.get_pos()
+            if pos[0] > trench.rect.x - 50 and pos[0] < trench.rect.x and pos[1] > 50 and pos[1] < 100:
+                trench.auto_send = True
+        #drawing the stop button
+        #if autosend is true than lowering the visibility of the button
+        if trench.auto_send:
+            pygame.draw.rect(screen, (150, 0, 0), (trench.rect.x-100, 50, 50, 50), 100)
+        else:
+            pygame.draw.rect(screen, (255, 0, 0), (trench.rect.x-100, 50, 50, 50))
+        if pygame.mouse.get_pressed()[0] and show_game_menu == False:
+            pos = pygame.mouse.get_pos()
+            if pos[0] > trench.rect.x - 100 and pos[0] < trench.rect.x - 50 and pos[1] > 50 and pos[1] < 100:
+                trench.auto_send = False
 
 # unit groups
 allied_unit_group = pygame.sprite.Group()
 enemy_unit_group = pygame.sprite.Group()
 # unit images, more images will be added later, this is just for testing
-unit_images_running = None
-unit_images_firing = None
+unit_images_running_allies = None
+unit_images_firing_allies = None
+unit_images_running_enemies = None
+unit_images_firing_enemies = None
 # tank images
-tank_images = None
+tank_images_allies = None
+tank_images_enemies = None
 
 # test trenches
 object_group = pygame.sprite.Group()
@@ -470,6 +541,7 @@ enemy_control = threading.Thread(target=enemy_con)
 
 # main loop
 running = True
+show_game_menu = False
 font = pygame.font.Font(None, 36)
 frame_rate = 60
 time_to_add_money = 1 * frame_rate
@@ -490,14 +562,14 @@ while running:
         if event.type == pygame.QUIT:
             running = False
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_a:
+            if event.key == pygame.K_a and show_game_menu == False:
                 x_offset += 25
-            if event.key == pygame.K_d:
+            if event.key == pygame.K_d and show_game_menu == False:
                 x_offset -= 25
             if event.key == pygame.K_LSHIFT:
                 shift = True
         if event.type == pygame.KEYUP:
-            if event.key == pygame.K_a or event.key == pygame.K_d:
+            if event.key == pygame.K_a  or event.key == pygame.K_d:
                 x_offset = 0
             if event.key == pygame.K_LSHIFT:
                 shift = False
@@ -507,7 +579,7 @@ while running:
                 pos = pygame.mouse.get_pos()
                 # checking if the player clicked on a unit
                 for unit in allied_unit_group:
-                    if unit.rect.collidepoint(pos):
+                    if unit.rect.collidepoint(pos) and show_game_menu == False:
                         if unit in selected_units:
                             selected_units.remove(unit)
                             if shift == False:
@@ -518,7 +590,7 @@ while running:
                         else:
                             selected_units.append(unit)
                 # checking if the player clicked on one of the right click menu buttons
-                if right_click_menu:
+                if right_click_menu and show_game_menu == False:
                     if pos[0] > menu_pos[0] + 15 and pos[0] < menu_pos[0] + 45 and pos[1] > menu_pos[1] - 15 and pos[1] < menu_pos[1] + 15:
                         #print("sending selected units forward")
                         for unit in selected_units:
@@ -528,10 +600,20 @@ while running:
                         for unit in selected_units:
                             send_a_unit_back(unit.in_trench_id, "alied", unit.id)
                 # checking if the player clicked on a buy button
-                elif pos[1] > 600:
+                elif pos[1] > 600 and show_game_menu == False:
                     for i in range(types_of_units):
                         if pos[0] > i * 100 and pos[0] < (i + 1) * 100:
                             buy(i, "alied")
+                # checking if the drop down menu button in the top left corner is clicked
+                elif pos[0] < 100 and pos[1] < 100:
+                    show_game_menu = True
+                # checking if some game menu option is clicked
+                elif show_game_menu:
+                    if pos[0] > width/2 - 200 and pos[0] < width/2 + 200 and pos[1] > height/2 - 50 and pos[1] < height/2 + 50:
+                        show_game_menu = False
+                    if pos[0] > width/2 - 200 and pos[0] < width/2 + 200 and pos[1] > height/2 + 50 and pos[1] < height/2 + 150:
+                        show_main_menu = True
+                        show_game_menu = False
             # opening the right click menu
             if event.button == 3 and len(selected_units) > 0:
                 if right_click_menu == False:
@@ -592,15 +674,25 @@ while running:
     text = font.render(str(money)+ " money", True, (0, 0, 0))
     screen.blit(text, (width/2- text.get_width()/2, 0))
 
+    # drawing the game menu
+    if show_game_menu:
+        pygame.draw.rect(screen, (50, 50, 50), (width/2 - 200, height/2 -50, 400, 100))
+        text = font.render("Resume", True, (0, 0, 0))
+        screen.blit(text, (width/2 - text.get_width()/2, height/2 - 25 + text.get_height()/2))
+        pygame.draw.rect(screen, (50, 50, 50), (width/2 - 200, height/2 + 50, 400, 100))
+        text = font.render("Exit to main menu", True, (0, 0, 0))
+        screen.blit(text, (width/2 - text.get_width()/2, height/2 + 75 + text.get_height()/2))
+
     # moving the units
-    for unit in allied_unit_group:
-        unit.move()
-        unit.fire(enemy_unit_group, allied_unit_group)
-        if unit in selected_units:
-            highlight_unit(unit)
-    for unit in enemy_unit_group:
-        unit.move()
-        unit.fire(enemy_unit_group, allied_unit_group)
+    if show_game_menu == False:
+        for unit in allied_unit_group:
+            unit.move()
+            unit.fire(enemy_unit_group, allied_unit_group)
+            if unit in selected_units:
+                highlight_unit(unit)
+        for unit in enemy_unit_group:
+            unit.move()
+            unit.fire(enemy_unit_group, allied_unit_group)
 
     # checking if the units are dead and removing them
     for unit in allied_unit_group:
@@ -653,14 +745,15 @@ while running:
             break
 
     # adding the money once per second
-    time_to_add_money -= 1
-    if time_to_add_money == 0:
-        money += 3
-        time_to_add_money = 1 * frame_rate
-    enemy_time_to_add_money -= 1
-    if enemy_time_to_add_money == 0:
-        enemy_money += 3
-        enemy_time_to_add_money = 1 * frame_rate
+    if show_game_menu == False:
+        time_to_add_money -= 1
+        if time_to_add_money == 0:
+            money += 3
+            time_to_add_money = 1 * frame_rate
+        enemy_time_to_add_money -= 1
+        if enemy_time_to_add_money == 0:
+            enemy_money += 3
+            enemy_time_to_add_money = 1 * frame_rate
 
     clock.tick(frame_rate)
     pygame.display.update()
