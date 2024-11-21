@@ -1,0 +1,1 @@
+This is the assets folder, it is used for images and sounds
