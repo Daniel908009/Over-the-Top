@@ -1,3 +1,5 @@
 {
-    "number_of_levels": 2
+    "names_of_nations": ["Tutorial","Germans","British","French","Russians","Austro-Hungarians","Americans","Ottomans","Greeks","Italians","Bulgarians","Serbians"],
+    "flags_of_nations": ["assets/default_flag1.png","assets/germany.png","assets/britain.png","assets/france.png","assets/russia.png","assets/austro-hungary.png","assets/america.png","assets/ottoman.png","assets/greece.png","assets/italy.png","assets/bulgaria.png","assets/serbia.png" ],
+    "status_of_nations":["Open","Soon","Soon","Soon","Soon","Soon","Soon","Soon","Soon","Soon","Soon","Soon"]
 }
