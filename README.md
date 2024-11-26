@@ -11,14 +11,14 @@
 <p>**Dont worry if you dont like overly complicated games** the enemy is currently suffering from heavy lobotomy so its easy to play :) </p>
 
 ## Current game features
-- [x] First few testing levels
-- [x] Some simple computer enemy
-- [x] Real time units spawning
-- [x] Units selection control menu
-- [] Different nations with different units #coming soon
-- [] Special actions like artilery or gas attack #coming soon
-- [] Resizability of the entire game #coming soon
-- [] Better images, and UI #coming soon
+[x] First few testing levels
+[x] Some simple computer enemy
+[x] Real time units spawning
+[x] Units selection control menu
+[] Different nations with different units #coming soon
+[] Special actions like artilery or gas attack #coming soon
+[] Resizability of the entire game #coming soon
+[] Better images, and UI #coming soon
 
 ## Controls
 <p>A, D for camera movement</p>
