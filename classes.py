@@ -4,7 +4,7 @@ import math
 
 # classes
 class tank(pygame.sprite.Sprite):
-    def __init__(self, owner, type, tank_images, enemy_flag, alied_flag, number_of_units, base_size):
+    def __init__(self, owner, type, tank_images, enemy_flag, alied_flag, number_of_units, base_size,health, damage, firerange, reloadtime, speed):
         super().__init__()
         self.owner = owner
         self.id = number_of_units + 1
@@ -22,10 +22,12 @@ class tank(pygame.sprite.Sprite):
         else:
             self.rect.x = alied_flag.rect.x
         self.rect.y = random.randint(base_size*2, base_size*12 - self.rect.height/2)
-        self.speed = 2
-        self.health = 500
-        self.damage = 5
-        self.fire_range = base_size*6
+        self.speed = speed
+        self.health = health
+        self.damage = damage
+        self.reload_time = reloadtime
+        self.time_since_last_fire = 0
+        self.fire_range = firerange
         self.in_trench = False
         self.left_trench = -1
         self.in_trench_id = -1
@@ -64,60 +66,31 @@ class tank(pygame.sprite.Sprite):
         #    self.index = 0
 
 class Unit(pygame.sprite.Sprite):
-    def __init__(self, type, owner, unit_images_running, unit_images_firing, enemy_flag, alied_flag, number_of_units, base_size):
+    def __init__(self, type, owner, unit_images_running, unit_images_firing, enemy_flag, alied_flag, number_of_units, base_size, health, damage, firerange, reloadtime, speed):
         super().__init__()
         self.owner = owner
         self.id = number_of_units + 1
         self.images_running = unit_images_running
-        if type == 0:
-            self.health = 100
-            self.damage = 5
-            self.fire_range = base_size*2
-            self.reload_time = 2
-            self.speed = 4
-            if owner == "alied":
-                self.image_running = unit_images_running[0]
-                self.image_firing = unit_images_firing[type]
-                self.image = self.image_running
-            elif owner == "enemy":
-                self.image_running = pygame.transform.flip(unit_images_running[0], True, False)
-                self.image_firing = pygame.transform.flip(unit_images_firing[type], True, False)
-                self.image = self.image_running
-        if type == 1:
-            self.health = 200
-            self.damage = 10
-            self.fire_range = base_size*4
-            self.reload_time = 1
-            self.speed = 3
-            if owner == "alied":
-                self.image_running = unit_images_running[0]
-                self.image_firing = unit_images_firing[type]
-                self.image = self.image_running
-            elif owner == "enemy":
-                self.image_running = pygame.transform.flip(unit_images_running[0], True, False)
-                self.image_firing = pygame.transform.flip(unit_images_firing[type], True, False)
-                self.image = self.image_running
-        if type == 2:
-            self.health = 300
-            self.damage = 12
-            self.fire_range = base_size*8
-            self.reload_time = 4
-            self.speed = 3
-            if owner == "alied":
-                self.image_running = unit_images_running[0]
-                self.image_firing = unit_images_firing[type]
-                self.image = self.image_running
-            elif owner == "enemy":
-                self.image_running = pygame.transform.flip(unit_images_running[0], True, False)
-                self.image_firing = pygame.transform.flip(unit_images_firing[type], True, False)
-                self.image = self.image_running
+        self.health = health
+        self.damage = damage
+        self.fire_range = firerange
+        self.reload_time = reloadtime + (random.randint(-3, 3)/10)
+        self.speed = speed
+        if owner == "alied":
+            self.image_running = unit_images_running[0]
+            self.image_firing = unit_images_firing
+            self.image = self.image_running
+        elif owner == "enemy":
+            self.image_running = pygame.transform.flip(unit_images_running[0], True, False)
+            self.image_firing = pygame.transform.flip(unit_images_firing, True, False)
+            self.image = self.image_running
         self.rect = self.image.get_rect()
         # making sure the units all spawn in the same place
         if owner == "enemy":
             self.rect.x = enemy_flag.rect.x
         else:
             self.rect.x = alied_flag.rect.x
-        self.rect.y = random.randint(base_size*2, base_size*12 - self.rect.height/2)
+        self.rect.y = random.randint(base_size*2, base_size*12 - int(self.rect.height/2))
         self.in_trench = False
         self.left_trench = -1
         self.in_trench_id = -1
@@ -125,6 +98,7 @@ class Unit(pygame.sprite.Sprite):
         self.firing = False
         self.type = type
         self.index = 0
+        self.time_since_last_fire = 0
 
     def move(self):
         if self.in_trench == False and self.owner == "alied" and not self.firing:
@@ -151,20 +125,34 @@ class Unit(pygame.sprite.Sprite):
     def fire(self, enemy_unit_group, allied_unit_group):
         if self.owner == "alied":
             for unit in enemy_unit_group:
+                #print(self.fire_range)
                 if unit.rect.x - self.rect.x < self.fire_range and unit.rect.x - self.rect.x > 0:
-                    unit.health -= self.damage
-                    self.firing = True
-                    break
-                else:
-                    self.firing = False
+                    if unit.in_trench == False:
+                        unit.health -= self.damage
+                        self.firing = True
+                        self.time_since_last_fire = 0
+                        break
+                    else:
+                        # if the unit is in trench, than the unit will only take half the damage
+                        unit.health -= int(self.damage/2)
+                        self.firing = True
+                        self.time_since_last_fire = 0
+                        break
         if self.owner == "enemy":
             for unit in allied_unit_group:
+                #print(self.fire_range)
                 if self.rect.x - unit.rect.x < self.fire_range and self.rect.x - unit.rect.x > 0:
-                    unit.health -= self.damage
-                    self.firing = True
-                    break
-                else:
-                    self.firing = False
+                    if unit.in_trench == False:
+                        unit.health -= self.damage
+                        self.firing = True
+                        self.time_since_last_fire = 0
+                        break
+                    else:
+                        # if the unit is in trench, than the unit will only take half the damage
+                        unit.health -= int(self.damage/2)
+                        self.firing = True
+                        self.time_since_last_fire = 0
+                        break
 
 class Trench(pygame.sprite.Sprite):
     def __init__(self, x, number_of_trenches, base_size):
@@ -239,14 +227,16 @@ class Trench(pygame.sprite.Sprite):
 
 # class for the bullets
 # later will fire at an angle to create a better effect
+# currently the angle and the way they spawn is weird, will have to rework
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, owner, image, x, y, range):
         super().__init__()
-        self.image = image
+        self.speed = 10
+        self.angle_of_flight = random.randint(-1, 1)
+        self.image = image # later will be rotated or just replaced with a different image
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
-        self.speed = 10
         self.range = range
         self.owner = owner
         if owner == "allied":
@@ -255,7 +245,7 @@ class Bullet(pygame.sprite.Sprite):
             self.direction = -1
     def move(self):
         self.rect.x += self.speed*self.direction
-        self.range -= self.speed
+        self.rect.y += self.angle_of_flight
 
 # flag class
 class Flag(pygame.sprite.Sprite):
@@ -290,6 +280,8 @@ class Button(pygame.sprite.Sprite):
         self.height = height
         if level != None:
             self.level = level
+    def y_offset(self, offset):
+        self.rect.y += offset
 
 # class for the gas clouds
 class Gas(pygame.sprite.Sprite):
@@ -303,6 +295,10 @@ class Gas(pygame.sprite.Sprite):
     def expand(self):
         self.rect.width += 1
         self.rect.height += 1
+    def damage(self, unit_group):
+        for unit in unit_group:
+            if self.rect.colliderect(unit.rect):
+                unit.health -= 1
 
 # class for the artillery bombardment
 class Artillery(pygame.sprite.Sprite):
