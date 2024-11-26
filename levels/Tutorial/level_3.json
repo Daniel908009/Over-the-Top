@@ -1,0 +1,8 @@
+{
+    "level_width": 2700,
+    "money": 100,
+    "positions_of_trenches" : [300,600,900,1200,1500,1800,2100,2400],
+    "allied" : "default",
+    "enemy" : "default",
+    "enemy_money" : 100
+}
