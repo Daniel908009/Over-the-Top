@@ -28,9 +28,13 @@
 <p>Other parts of the game are pretty intuitive, like selecting the level or the test mode</p>
 
 ### The trench menu explanation
-
+![image](https://github.com/user-attachments/assets/d5be9b74-b60e-4d4f-a726-511f7f70c4da)
 <p>The trench menu is very simple, you can click the left arrow to tell the units to fall back, the right arrow to send them into attack, the arrow aiming to the top is the menu opening arrow, once clicked it will show all types of units in the trench and you can specificaly send one type of units into attack. The most interesting is the red light/green light button, if it is set to green, then all the units regardless of the type will be send through to the next trench.</p>
+<p>The tank image will also soon be changed by the way.</p>
 
 ## Screenshots
+![image](https://github.com/user-attachments/assets/c68570a9-08f1-4b24-a3b6-4f1a6d875a1d)
+![image](https://github.com/user-attachments/assets/0958929a-6f1d-40bb-b1b8-1290c8d6a4be)
+![image](https://github.com/user-attachments/assets/ef967423-035e-4341-9256-eae539ad0a7c)
 
 ## Download instructions
